@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CVcheck: free ATS score and job match</title>
+<style>
+:root{--bg:#f5f7fa;--card:#fff;--ink:#17202b;--muted:#5d6b7a;--line:#dce3ea;--brand:#2f4bd8;--good:#12805c;--warn:#b86e00;--bad:#c2332b;--soft:#eef1fb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0f141b;--card:#171e27;--ink:#e9eef4;--muted:#9aa9b8;--line:#28333f;--brand:#8da2ff;--good:#3ecf9e;--warn:#f0a63a;--bad:#ff7b72;--soft:#1d2636;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:0 16px}
+header{padding:20px 0;display:flex;justify-content:space-between;align-items:center}
+.logo{font:700 1.3rem Georgia,"Times New Roman",serif;letter-spacing:-.02em}
+.logo i{color:var(--brand);font-style:normal}
+.privacy{font-size:.85rem;color:var(--muted)}
+.hero{padding:16px 0 28px}
+h1{font:700 clamp(1.9rem,5vw,2.8rem)/1.1 Georgia,"Times New Roman",serif;letter-spacing:-.02em;margin:0 0 12px;max-width:18ch}
+.hero p{color:var(--muted);margin:0;max-width:55ch;font-size:1.05rem}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.inputs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:720px){.inputs{grid-template-columns:1fr}}
+.field label{display:flex;justify-content:space-between;font-weight:600;margin-bottom:6px}
+.field label span{font-weight:400;color:var(--muted);font-size:.85rem}
+textarea{width:100%;min-height:240px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;font-size:.95rem;resize:vertical}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:16px}
+button{font:inherit;font-weight:600;border-radius:10px;padding:11px 20px;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+@media (prefers-color-scheme:dark){button.primary{color:#0b1020}}
+button.link{border:0;background:none;color:var(--brand);padding:11px 6px}
+.hint{color:var(--muted);font-size:.85rem;margin-left:auto}
+#results{margin:28px 0 56px}
+.verdict{font:600 1.35rem/1.35 Georgia,"Times New Roman",serif;margin:0 0 18px}
+.gauges{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+@media (max-width:720px){.gauges{grid-template-columns:1fr}}
+.gauge{display:flex;gap:16px;align-items:center}
+.gauge svg{flex:none;width:96px;height:96px;transform:rotate(-90deg)}
+.gauge circle{fill:none;stroke-width:10}
+.gauge .track{stroke:var(--line)}
+.gauge .arc{stroke-linecap:round;transition:stroke-dashoffset .9s ease}
+@media (prefers-reduced-motion:reduce){.gauge .arc{transition:none}}
+.gauge b{font-size:2rem;display:block;line-height:1}
+.gauge small{color:var(--muted)}
+h2{font-size:1.05rem;margin:0 0 4px}
+.sub{color:var(--muted);font-size:.9rem;margin:0 0 12px}
+.chips{margin-bottom:14px}
+.chip{display:inline-block;margin:0 6px 6px 0;padding:3px 10px;border-radius:999px;font-size:.9rem;border:1px solid var(--line)}
+.chip.ok{background:var(--soft);border-color:transparent}
+.chip.miss{border-color:var(--bad);color:var(--bad)}
+.card{margin-bottom:16px}
+.fix{padding:10px 0;border-top:1px solid var(--line);display:flex;gap:12px}
+.fix:first-of-type{border-top:0}
+.pts{flex:none;min-width:3.4rem;font-weight:700;text-align:right}
+.pts.bad{color:var(--bad)}.pts.warn{color:var(--warn)}.pts.good{color:var(--good)}
+details summary{cursor:pointer;font-weight:600;color:var(--muted)}
+.hidden{display:none}
+.up{display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap}.up small{color:var(--muted)}
+.field input[type=text],#loc{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;margin-top:8px}
+.field .tip{display:block;color:var(--muted);font-size:.85rem;margin-top:6px}
+#rank{margin-bottom:56px}
+.rk{display:grid;grid-template-columns:2.4rem 1fr auto;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+#rows .rk:first-child{border-top:0}
+.rn{font:700 1.2rem Georgia,"Times New Roman",serif;color:var(--muted)}
+.ra{text-align:right}.ra b{font-size:1.8rem;display:block;line-height:1}.ra small{color:var(--muted);display:block}
+.sal{font-size:.9rem;margin-top:4px}.tagl{font-weight:700}.src{margin-left:4px}
+footer{color:var(--muted);font-size:.85rem;padding:0 0 40px}
+@media print{header,.hero,.panel.in,.actions,footer{display:none}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">CV<i>check</i></div>
+    <div class="privacy">Checks run in your browser. Saved jobs stay on this device.</div>
+  </header>
+
+  <section class="hero">
+    <h1>Will your CV get past the robots?</h1>
+    <p>Upload or paste your CV and a job posting. In seconds you get a readability score, a keyword match, and a short list of what to fix.</p>
+  </section>
+
+  <section class="panel in">
+    <div class="inputs">
+      <div class="field">
+        <label for="cv">Your CV <span id="cvc">0 words</span></label>
+        <textarea id="cv" placeholder="Paste the text of your CV, or upload a file below"></textarea>
+        <div class="up"><button type="button" id="pick">Upload PDF or DOCX</button><input id="file" type="file" accept=".pdf,.docx" hidden><small id="fmsg"></small></div>
+      </div>
+      <div class="field">
+        <label for="jd">Job posting <span id="jdc">optional</span></label>
+        <textarea id="jd" placeholder="Paste the whole posting: tasks, requirements and nice-to-haves. Tools mentioned anywhere are counted."></textarea>
+        <input type="text" id="jlabel" maxlength="80" placeholder="Label, e.g. Company - Role (optional)" aria-label="Job label">
+        <span class="tip">Paste everything. Postings often list tools in the tasks that are missing from the requirements, and we check both.</span>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="primary" id="go" type="button">Check my CV</button>
+      <button class="link" id="sample" type="button">Try an example</button>
+      <button class="link" id="clear" type="button">Clear</button>
+      <span class="hint">Ctrl + Enter</span>
+    </div>
+  </section>
+
+  <section id="results" class="hidden" aria-live="polite"></section>
+  <section id="rank" class="panel hidden">
+    <h2>My job ranking</h2>
+    <p class="sub">Jobs you saved, ranked by how well your current CV fits. Saved in this browser only.</p>
+    <div class="actions"><input type="text" id="loc" placeholder="Country or city for salary estimates, e.g. Warsaw, Poland" aria-label="Location for salary estimates" style="flex:1;min-width:220px;margin:0"><button id="upd" type="button">Update ranking</button><button id="wipe" class="link" type="button">Remove all</button></div>
+    <div id="rows"></div>
+  </section>
+  <footer>Scores measure how readable and relevant your CV is. No tool can know what a specific company's ATS decides. English only for now. The optional AI analysis and salary estimates send text to an AI provider. Salary estimates are assumptions, not offers.</footer>
+</div>
+
+<script>
+const STOP = new Set(("a an and are as at be but by can for from has have in into is it its of on or our that the their this to was we will with you your they them those these than then there here who what when where which while also etc per via within across including include required requirements preferred plus must should would could able ability abilities experience experienced work working works team teams strong skills skill years year role roles join company looking candidate candidates job position responsibilities responsibility opportunity benefits good great excellent knowledge understanding using use used new more other such well like need needs help make part business people ensure support day time both each any all not no yes one two three someone small own run result results get gets will able ownership practical connected through various relevant related key high level responsible poland polska germany france spain italy netherlands belgium sweden norway denmark finland ireland kingdom england scotland switzerland austria czech czechia slovakia hungary romania bulgaria lithuania latvia estonia ukraine portugal greece turkey india china japan singapore australia canada usa states america europe emea apac mazowieckie wielkopolskie malopolskie dolnoslaskie slaskie pomorskie lodzkie lubelskie podkarpackie podlaskie zachodniopomorskie lubuskie opolskie swietokrzyskie warsaw warszawa krakow poznan wroclaw gdansk gdynia lodz katowice szczecin lublin bydgoszcz berlin london paris madrid dublin amsterdam hybrid remote onsite applicants applicant").split(" "));
+const VERBS = "achieved built created delivered designed developed drove improved increased launched led managed optimized reduced implemented analyzed automated coordinated deployed established generated negotiated organized planned resolved streamlined trained supervised owned shipped migrated".split(" ");
+const SAMPLE_CV = "Jane Doe (example)\njane.doe@example.com | +00 000 000 000 | linkedin.com/in/jane-doe-example\n\nExperience\nMarketing Specialist, BrightWave (2021-2024)\n- Managed social media campaigns that increased engagement by 45%\n- Led a team of 3 and launched 12 email campaigns, reaching 80,000 subscribers\n- Reduced cost per lead by 18% through A/B testing and SEO improvements\n\nEducation\nBA in Communication, Example University\n\nSkills\nSEO, Google Analytics, content marketing, Canva, email marketing";
+const SAMPLE_JD = "Digital Marketing Manager\nWe are looking for someone to lead our digital marketing strategy. You will manage paid social campaigns, run SEO and content marketing, analyze performance in Google Analytics and report on campaign results. Experience with marketing automation, A/B testing and email marketing is required. Requirements: 3+ years in digital marketing and a degree. You will lead a small team and own the content calendar.";
+
+const $ = id => document.getElementById(id);
+const norm = w => w.length > 4 ? w.replace(/(ing|ed|es|s)$/, "").replace(/e$/, "") : w;
+const fold = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ł/g, "l").replace(/Ł/g, "L");
+const tokens = t => (fold(t).toLowerCase().match(/[a-z0-9][a-z0-9+#.\-]*/g) || []).map(w => w.replace(/[.\-]+$/, "")).filter(w => w.length >= 2 && !/^\d[\d+.,]*$/.test(w));
+
+const SYN = {js:"javascript",ts:"typescript",k8s:"kubernetes",ml:"machine learning",nodejs:"node.js",reactjs:"react",golang:"go",postgres:"postgresql",gcp:"google cloud",aws:"amazon web services",ux:"user experience",ui:"user interface",seo:"search engine optimization",ppc:"pay per click",kpis:"kpi",ci:"continuous integration"};
+const canon = w => SYN[w] || norm(w);
+const SECW = { req: 3, duty: 2, intro: 1, nice: 1, noise: 0 };
+const CHROME = /^(easy apply|apply( now)?|saved?|show (more|less)|see (more|less)|premium|promoted by hirer|responses managed off linkedin|people you can reach out to|meet the hiring team|set alert|share|report( this job)?|reposted.*|be an early applicant|over \d+ applicants|\d+ (applicants?|connections?|alumni|school alumni|company alumni).*|(company|school) alumni (from|work).*|.*alumni work here|.* alumni from .*|see how you compare.*|matches your job preferences.*|.*clicked apply.*|full[- ]time|part[- ]time|contract|internship|temporary|mid-senior level|entry level|seniority level|employment type|job function|industries?)$/i;
+function companyNames(jd, extra){
+  const out = new Set((extra || []).map(canon)), bad = /^(the|you|us|this|our|your|role|job|team|company|we|a|an)$/i;
+  const re = [/\bAbout ([A-Z][A-Za-z&]{2,})/g, /\bAt ([A-Z][A-Za-z&]{2,}),? we\b/g, /\bJoin ([A-Z][A-Za-z&]{2,})/g, /\b([A-Z][A-Za-z&]{2,}) is (?:a|an|the) [a-z -]{0,40}(?:company|organi[sz]ation|group|leader|firm)/g, /\bWe at ([A-Z][A-Za-z&]{2,})/g];
+  for (const r of re) for (const m of jd.matchAll(r)) if (!bad.test(m[1])) out.add(canon(fold(m[1]).toLowerCase()));
+  return out;
+}
+const isMeta = line => /\s[·•|]\s/.test(line) && line.length < 200;
+function findTitle(jd){
+  const L = jd.split("\n").map(x => x.trim()).filter(Boolean), mi = L.findIndex(isMeta);
+  const ok = l => !CHROME.test(l) && !isMeta(l) && !headingType(l) && !/^(about|job (description|title|summary))\b/i.test(l) && !/[.!?:,;]/.test(l) && l.split(/\s+/).length <= 9 && l.length >= 4 && l.length <= 80 && !/^(at|we|our|you|join|if|as|the|a|an)\s/i.test(l) && !/^[-*•]/.test(l);
+  if (mi > 0) { for (let i = mi - 1; i >= 0; i--) if (ok(L[i])) return L[i]; }
+  for (const l of L.slice(0, 4)) if (ok(l)) return l;
+  const m = jd.match(/\bAs an? ([A-Z][A-Za-z&\/ -]{3,60}?)(?: in| on| at| within| for| with|,|\.)/) || jd.match(/\b(?:looking for|seeking|hiring) an? ([A-Z][A-Za-z&\/ -]{3,60}?)(?: to| who| with| in| for|,|\.)/);
+  return m ? m[1].trim() : "";
+}
+const HEAD = [
+  ["noise", /^(about (us|the company|our company)|who we are|benefits|what we offer|we offer|perks|why join( us)?|our offer|o nas|oferujemy)$/i],
+  ["nice", /(nice to have|preferred|bonus|desirable|mile widziane|a plus|would be a plus)/i],
+  ["req", /(who you are|what you bring|what you need|what you'll need|your qualifications|minimum qualifications|basic qualifications|requirements?|qualifications?|what we expect|what we('| a)re looking for|must[- ]have|you have|you bring|about you|your profile|we expect|expectations?|wymagania|oczekiwania|skills? and experience|experience and skills)/i],
+  ["duty", /(about the job|job description|responsibilit|duties|what you('| wi)ll do|about the role|the role|your tasks|day[- ]to[- ]day|scope|your mission|obowiązki|zakres)/i]
+];
+function headingType(line){
+  const t = line.replace(/[:\-–*#•\s]+$/, "").replace(/^[*#•\s-]+/, "").trim();
+  if (t.length < 3 || t.length > 60 || t.split(/\s+/).length > 7 || /[.!?]$/.test(t)) return null;
+  if (/^About\s+(?!the\b|you\b|us\b|this\b|our\b|your\b)[A-Z]/.test(t)) return "noise";
+  for (const [k, re] of HEAD) if (re.test(t)) return k;
+  return null;
+}
+function parseJD(jd){
+  const lines = jd.split("\n"); let sec = lines.some(l => headingType(l.trim())) ? "intro" : "duty"; const out = [];
+  for (const raw of lines) {
+    let line = raw.trim(); if (!line || CHROME.test(line)) continue;
+    if (isMeta(line)) { out.push({ text: line, sec: "noise" }); continue; }
+    const h = headingType(line); if (h) { sec = h; continue; }
+    if (/^\s*(salary|compensation|wynagrodzenie|stawka|rate)\b/i.test(line) || parseSalary(line)) { out.push({ text: line, sec: "noise" }); continue; }
+    const m = line.match(/^([A-Za-z][A-Za-z '&\/,-]{2,50}):\s*(.+)$/);
+    if (m && headingType(m[1])) { sec = headingType(m[1]); line = m[2]; }
+    out.push({ text: line, sec });
+  }
+  return out;
+}
+const coreText = jd => parseJD(jd).filter(x => x.sec !== "noise").map(x => x.text).join("\n");
+
+const SKILLS = ["sql","python","excel","power bi","tableau","javascript","typescript","java","c++","c#","react","node.js","aws","azure","google cloud","docker","kubernetes","git","jira","sap","salesforce","hubspot","figma","photoshop","google analytics","seo","crm","erp","vba","looker","snowflake","spark","airflow","dbt","power query","powerpoint","confluence","linux","terraform","tensorflow","pytorch","machine learning","jenkins","agile","scrum","kanban","six sigma","workday","quickbooks","xero","canva","wordpress","shopify","google ads","meta ads","power automate","sharepoint","postgresql","mysql","mongodb","redis","kafka","graphql","html","css","php","ruby","rust","swift","kotlin","matlab","stata","spss","autocad","solidworks","alteryx","uipath","power platform","microsoft office","iam","sox","gdpr","kyc","aml"];
+const inText = (txt, k) => new RegExp("(^|[^a-z0-9+#])" + k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "([^a-z0-9+#]|$)").test(txt);
+function hiddenReqs(cv, jd){
+  const segs = parseJD(jd).filter(x => x.sec !== "noise");
+  if (!segs.some(x => x.sec === "req")) return [];
+  const get = (...secs) => segs.filter(x => secs.includes(x.sec)).map(x => x.text.toLowerCase()).join("\n");
+  const duty = get("duty"), req = get("req", "nice"), mine = cv.toLowerCase();
+  return SKILLS.filter(k => inText(duty, k) && !inText(req, k)).map(k => ({ k, has: inText(mine, k) }));
+}
+function hiddenCard(cv, jd){
+  const list = hiddenReqs(cv, jd); if (!list.length) return null;
+  const c = el("div", "panel card");
+  c.append(el("h2", "", "Tools in the tasks, but not in the requirements"), el("p", "sub", "Postings often list different things in the tasks and in the requirements. These tools appear only in the tasks. They still count in your match, and interviewers may ask about them."));
+  const have = list.filter(x => x.has).map(x => x.k), lack = list.filter(x => !x.has).map(x => x.k);
+  if (lack.length) { c.append(el("p", "sub", "Not in your CV")); c.append(chipRow(lack, "miss")); }
+  if (have.length) { c.append(el("p", "sub", "Already in your CV")); c.append(chipRow(have, "ok")); }
+  return c;
+}
+
+function numVal(str, k){
+  const t = str.replace(/[\s\u00a0]/g, "");
+  const v = /^\d{1,3}([,.]\d{3})+$/.test(t) ? +t.replace(/[,.]/g, "") : parseFloat(t.replace(",", "."));
+  return k ? v * 1000 : v;
+}
+const CURMAP = { pln: "PLN", "zł": "PLN", zl: "PLN", eur: "EUR", "€": "EUR", usd: "USD", "$": "USD", gbp: "GBP", "£": "GBP", chf: "CHF" };
+function parseSalary(jd){
+  const N = "(\\d{1,3}(?:[ \\u00a0,.]\\d{3})+|\\d+(?:[.,]\\d+)?)\\s?(k|tys\\.?)?", C = "(pln|zł|zl|eur|€|usd|\\$|gbp|£|chf)", R = "\\s*(?:-|–|—|to|do)\\s*", Cn = C.replace("(", "(?:");
+  const A = new RegExp(N + R + N + "\\s?" + C, "i"), B = new RegExp(C + "\\s?" + N + "(?:" + R + "(?:" + Cn + ")?\\s?" + N + ")?", "i");
+  let min, max, cur, at;
+  let m = A.exec(jd);
+  if (m) { min = numVal(m[1], m[2] || m[4]); max = numVal(m[3], m[4]); cur = m[5]; at = m.index; }
+  else if ((m = B.exec(jd))) { cur = m[1]; min = numVal(m[2], m[3] || m[5]); max = m[4] ? numVal(m[4], m[5]) : min; at = m.index; }
+  else if ((m = new RegExp(N + "\\s?" + C, "i").exec(jd))) { min = max = numVal(m[1], m[2]); cur = m[3]; at = m.index; }
+  else return null;
+  const ctx = jd.slice(Math.max(0, at - 80), at + m[0].length + 80).toLowerCase();
+  if (!/(salary|compensation|pay\b|remuneration|wage|wynagrodzenie|stawka|widełki|rate|offer|up to|gross|net\b|brutto|netto|b2b|per (month|year|hour|annum)|monthly|annual|hourly|\/\s?(month|mo|year|yr|h|hr)|mc\b|rocznie|miesięcznie)/.test(ctx)) return null;
+  if (!(min > 0) || !(max >= min)) return null;
+  let period = /(per hour|hourly|\/\s?h\b|\/\s?hr|\/\s?hour|godz)/.test(ctx) ? "hour" : /(per month|monthly|\/\s?mo\b|\/\s?month|miesi|\bmc\b|\/mc)/.test(ctx) ? "month" : /(per year|annual|annually|per annum|yearly|\/\s?yr|\/\s?year|rocznie|p\.a\.)/.test(ctx) ? "year" : "";
+  const guessed = !period; if (!period) period = max < 300 ? "hour" : max < 30000 ? "month" : "year";
+  return { min, max, cur: CURMAP[cur.toLowerCase()] || cur, period, basis: /(brutto|gross)/.test(ctx) ? "gross" : /(netto|\bnet\b)/.test(ctx) ? "net" : "", b2b: /b2b/.test(ctx), guessed };
+}
+
+const SKILLCANON = new Set(SKILLS.map(x => x.split(" ").map(canon).join(" ")));
+const GENERIC = new Set(("data access management operational activities activity reporting report workflow technology technologies request requests stakeholder stakeholders process processes system systems tool tools team teams business risk quality support review reviews analysis documentation testing improvement improvements evidence requirement requirements application applications service services solution solutions project projects delivery performance development environment procedure procedures plan plans structured control controls timely accurate accurately clear independently priority priorities issue issues closure knowledge understanding skill skills working ability audience audiences concept concepts consideration considerations outcome outcomes opportunity opportunities impact measurable meaningful daily volume workload deadline deadlines manager managers level levels role roles task tasks work enjoy problem solving solve excellence recurring help helps ensure drive deliver partner maintain perform execute identify improve compile analyze validate prioritize apply follow produce resolve simplify simplifying maintaining").split(" ").map(canon));
+const unhyph = t => t.replace(/([A-Za-z])-(?=[A-Za-z])/g, "$1 ");
+function keywordMatch(cv, jd, extra){
+  const cnt = new Map(), disp = new Map(), named = new Set(), acr = new Set(), lowerSeen = new Set();
+  const meta1 = jd.split("\n").map(x => x.trim()).find(isMeta), coName = new Set([...(meta1 ? tokens(meta1.split(/\s[·•|]\s/)[0]).map(canon) : []), ...companyNames(jd, extra)]);
+  const bump = (k, w, d) => { if (!disp.has(k)) disp.set(k, d); const o = cnt.get(k) || [0, 0]; o[0]++; o[1] += w; cnt.set(k, o); };
+  const shown = r => /^[A-Z0-9]{2,6}$/.test(r) || /^[a-z]+[A-Z]/.test(r) ? r : r.toLowerCase();
+  for (const { text, sec } of parseJD(jd)) for (const s of text.split(/[!?;•]+|\.\s/)) {
+    const base = SECW[sec]; if (!base) continue;
+    const w = /\b(preferred|nice to have|bonus|desirable|ideally)\b/i.test(s) ? 1 : /\b(required|must|essential|mandatory)\b/i.test(s) ? 3 : base;
+    const toks = []; let brk = true;
+    for (const part of (fold(unhyph(s)).match(/[A-Za-z0-9][A-Za-z0-9+#.\-]*|[,()\/:\u2013\u2014]/g) || [])) {
+      if (/^[,()\/:\u2013\u2014]$/.test(part)) { brk = true; continue; }
+      const r = part.replace(/[.\-]+$/, "");
+      if (r.length < 2 || /^\d[\d+.,]*$/.test(r)) { brk = true; continue; }
+      toks.push({ r, brk }); brk = false;
+    }
+    toks.forEach((t, i) => {
+      const r = t.r, x = r.toLowerCase(); if (STOP.has(x) || coName.has(canon(x))) return;
+      const k = canon(x); if (r === x) lowerSeen.add(k);
+      if (/^[A-Z0-9]{2,6}$/.test(r) || /^[a-z]+[A-Z]/.test(r)) acr.add(k);
+      else if (i > 0 && /^[A-Z][a-z]/.test(r)) named.add(k);
+      bump(k, w, shown(r));
+      const n = toks[i + 1];
+      if (n && !n.brk) { const nx = n.r.toLowerCase(); if (!STOP.has(nx) && !coName.has(canon(nx))) bump(k + " " + canon(nx), w, shown(r) + " " + shown(n.r)); }
+    });
+  }
+  const isNamed = k => named.has(k) && !lowerSeen.has(k);
+  const tool = k => SKILLCANON.has(k) || acr.has(k), generic = k => k.split(" ").every(x => GENERIC.has(x));
+  const cand = [];
+  for (const [k, o] of cnt) {
+    const ws = k.split(" ");
+    if (ws.length === 1) {
+      if (GENERIC.has(k)) continue;
+      if (tool(k) || (isNamed(k) && o[0] >= 2) || o[0] >= 4) cand.push([k, o[1] * (tool(k) || isNamed(k) ? 1.5 : 1)]);
+    } else if (SKILLCANON.has(k) || ws.every(x => tool(x) || isNamed(x)) || o[0] >= 3 || (o[0] >= 2 && !generic(k))) cand.push([k, o[1] * 1.5]);
+  }
+  cand.sort((a, b) => b[1] - a[1]);
+  const usedTool = new Set(), usedAny = new Set(), picked = [];
+  for (const phase of [2, 1]) for (const [k, sc] of cand) {
+    const ws = k.split(" "); if ((ws.length > 1 ? 2 : 1) !== phase) continue;
+    if (phase === 2 ? ws.some(x => usedTool.has(x)) : usedAny.has(k)) continue;
+    picked.push([k, sc]); ws.forEach(x => { usedAny.add(x); if (tool(x) || isNamed(x)) usedTool.add(x); });
+  }
+  const list = picked.sort((a, b) => b[1] - a[1]).slice(0, 25).map(([k]) => [k, cnt.get(k)[1]]);
+  const flat = " " + tokens(unhyph(cv)).map(canon).join(" ") + " ";
+  let total = 0, found = 0; const hit = [], miss = [];
+  for (const [k, wt] of list) { total += wt; if (flat.includes(" " + k + " ")) { found += wt; hit.push(disp.get(k) || k); } else miss.push(disp.get(k) || k); }
+  return { pct: total ? Math.round(found / total * 100) : 0, hit, miss };
+}
+
+function yearsInCv(cv){
+  const ys = new Set(), now = new Date().getFullYear();
+  for (const m of cv.matchAll(/\b((?:19|20)\d{2})\s*(?:-|–|—|to)\s*((?:19|20)\d{2}|present|current|now)\b/gi)) {
+    const a = +m[1], b = /\d/.test(m[2]) ? +m[2] : now;
+    for (let y = a; y < b; y++) ys.add(y);
+  }
+  return ys.size;
+}
+function reqs(cv, jd){
+  const out = [], lcv = cv.toLowerCase(), ljd = coreText(jd).toLowerCase();
+  const ys = [...ljd.matchAll(/(\d{1,2})\s*\+?\s*(?:-\s*\d{1,2}\s*)?years?/g)].map(x => +x[1]).filter(n => n > 0 && n <= 20);
+  if (ys.length) {
+    const need = Math.max(...ys), have = yearsInCv(cv);
+    out.push({ name: "Experience", s: have >= need ? "good" : have > 0 && have >= need - 1 ? "warn" : "bad", msg: "The posting mentions " + need + "+ years. Your dated roles add up to about " + have + (have === 0 ? ". Add dates like 2021-2024 so parsers can count them." : ".") });
+  }
+  const lvl = t => /\b(ph\.?d|doctorate)\b/.test(t) ? 3 : /\b(master|msc|m\.sc|mba)\b/.test(t) ? 2 : /\b(bachelor|bsc|b\.sc|ba|degree)\b/.test(t) ? 1 : 0;
+  const names = ["", "a bachelor's degree", "a master's degree", "a doctorate"], need = lvl(ljd), have = lvl(lcv);
+  if (need) out.push({ name: "Education", s: have >= need ? "good" : "bad", msg: have >= need ? "The posting asks for " + names[need] + ". Your CV shows a matching level." : "The posting asks for " + names[need] + ". Your CV does not clearly show it." });
+  const first = findTitle(jd);
+  if (first) {
+    const t = tokens(first).filter(w => !STOP.has(w)).map(canon), flat = " " + tokens(cv).map(canon).join(" ") + " ";
+    if (t.length) { const h = t.filter(w => flat.includes(" " + w + " ")).length / t.length;
+      out.push({ name: "Job title", s: h >= .99 ? "good" : h >= .5 ? "warn" : "bad", msg: h >= .99 ? "Your CV contains the words of the job title." : "The posting's title is '" + first + "'. Use that wording in your headline or role titles if it honestly fits." }); }
+  }
+  return out;
+}
+function reqCard(cv, jd){
+  const c = el("div", "panel card"), list = reqs(cv, jd);
+  c.append(el("h2", "", "Requirements in the posting"), el("p", "sub", "Checked against what your CV shows. This is an estimate, so verify it yourself."));
+  if (!list.length) c.append(el("p", "", "No clear requirements (years, degree, title) were detected."));
+  list.forEach(r => { const row = el("div", "fix"); row.append(el("span", "pts " + r.s, r.s === "good" ? "Met" : r.s === "warn" ? "Close" : "Gap")); const b = el("div"); b.append(el("strong", "", r.name + ". "), document.createTextNode(r.msg)); row.append(b); c.append(row); });
+  return c;
+}
+
+function atsChecks(cv){
+  const lower = cv.toLowerCase(), tk = tokens(cv), words = tk.length;
+  const nums = (cv.match(/\d+(?:[.,]\d+)?/g) || []).length;
+  const verbs = new Set(tk.filter(w => VERBS.includes(w)));
+  const body = cv.split("\n").map(l => l.replace(/^\s*[\uE000-\uF8FF\u2022\u25CF\u25AA\u25CB\u2013*-]\s*/, "")).join("\n");
+  const odd = (body.match(/[\uE000-\uF8FF\u2500-\u257F\u2600-\u27BF]|[\u{1F300}-\u{1FAFF}]/gu) || []).length;
+  const has = re => re.test(lower), L = [];
+  const add = (name, max, got, good, bad) => L.push({ name, max, got, msg: got === max ? good : bad });
+  add("Email", 10, /[\w.+-]+@[\w-]+\.[\w.-]+/.test(cv) ? 10 : 0, "Email found.", "No email found. Put it at the top as plain text.");
+  add("Phone", 10, /\+?\d[\d\s().-]{7,}\d/.test(cv) ? 10 : 0, "Phone number found.", "No phone number found. Add one at the top.");
+  add("Experience heading", 10, has(/\b(experience|employment|work history)\b/) ? 10 : 0, "Experience heading found.", "No heading named Experience or Work Experience. Parsers look for standard names.");
+  add("Education heading", 10, has(/\b(education|degree|university|bachelor|master)\b/) ? 10 : 0, "Education heading found.", "No Education heading found. Add one, even if short.");
+  add("Skills heading", 10, has(/\bskills?\b/) ? 10 : 0, "Skills heading found.", "No Skills heading found. Add a plain list of tools and skills.");
+  add("Length", 10, words >= 300 && words <= 900 ? 10 : words >= 150 && words <= 1200 ? 5 : 0, "Length is right (" + words + " words).", "Length is " + words + " words. Aim for 300-900, about one or two pages.");
+  add("Numbers and results", 15, nums >= 8 ? 15 : nums >= 4 ? 8 : 0, "Good use of numbers.", "Only " + nums + " numbers found. Show results, like 'cut costs by 18%' or 'managed 5 people'.");
+  add("Action verbs", 10, verbs.size >= 6 ? 10 : verbs.size >= 3 ? 5 : 0, "Strong action verbs.", "Only " + verbs.size + " action verbs. Start bullets with built, led, improved, launched.");
+  add("Simple formatting", 10, odd <= 2 ? 10 : odd <= 8 ? 5 : 0, "No icons or decorative symbols found. Normal bullets are fine.", "Found " + odd + " icons or decorative symbols (phone, mail or star icons, boxes). They often turn into garbled characters. Use plain text labels and normal bullets.");
+  add("Profile link", 5, has(/linkedin\.com|github\.com|portfolio|https?:\/\//) ? 5 : 0, "Profile link found.", "No LinkedIn or portfolio link. Add one if you have it.");
+  if (meta) {
+    add("File readable", 15, meta.chars >= 300 ? 15 : 0, "Text was extracted cleanly from " + meta.name + ".", "Little or no text could be extracted. This looks like a scanned or image-based file, which most ATS cannot read. Export a text-based PDF from Word or Google Docs.");
+    const bad = meta.columns || meta.tables > 0;
+    add("Single-column layout", 15, bad ? 0 : 15, "No columns or tables detected in the file.", meta.tables > 0 ? "The file contains " + meta.tables + " table(s). Many ATS read tables out of order or skip them. Use plain paragraphs and bullets." : "The layout looks like multiple columns. Parsers often read across columns and mix up the text. Use one column.");
+  }
+  return L;
+}
+
+function el(tag, cls, text){ const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; }
+const tone = v => v >= 75 ? "good" : v >= 50 ? "warn" : "bad";
+
+function gauge(title, value, hint){
+  const c = el("div", "panel gauge"), R = 40, C = 2 * Math.PI * R;
+  c.innerHTML = '<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="track" cx="50" cy="50" r="40"/><circle class="arc" cx="50" cy="50" r="40"/></svg>';
+  const arc = c.querySelector(".arc");
+  arc.style.stroke = "var(--" + tone(value) + ")";
+  arc.style.strokeDasharray = C; arc.style.strokeDashoffset = C;
+  requestAnimationFrame(() => requestAnimationFrame(() => arc.style.strokeDashoffset = C * (1 - value / 100)));
+  const t = el("div"); t.append(el("small", "", title), el("b", "", value + "%"), el("small", "", hint));
+  c.append(t); return c;
+}
+
+function chipRow(words, cls){ const w = el("div", "chips"); words.forEach(k => w.append(el("span", "chip " + cls, k), document.createTextNode(" "))); return w; }
+
+function fixRow(x){
+  const r = el("div", "fix"), lost = x.max - x.got;
+  r.append(el("span", "pts " + (lost === 0 ? "good" : x.got === 0 ? "bad" : "warn"), lost === 0 ? "OK" : "+" + lost));
+  const b = el("div"); b.append(el("strong", "", x.name + ". "), document.createTextNode(x.msg)); r.append(b); return r;
+}
+
+let lastReport = "";
+function run(){
+  const cv = $("cv").value.trim(), jd = $("jd").value.trim(), out = $("results");
+  out.replaceChildren(); out.classList.remove("hidden");
+  if (cv.length < 100) { out.append(el("div", "panel", "Paste your full CV first. It needs at least a few lines.")); return; }
+  const checks = atsChecks(cv), ats = Math.round(checks.reduce((s, c) => s + c.got, 0) / checks.reduce((s, c) => s + c.max, 0) * 100);
+  const m = jd.length >= 80 ? keywordMatch(cv, jd, companyOf($("jlabel").value)) : null;
+  const worst = checks.filter(c => c.got < c.max).sort((a, b) => (b.max - b.got) - (a.max - a.got));
+
+  let v = ats >= 80 ? "Your CV is easy for a parser to read." : ats >= 55 ? "Your CV is readable but has gaps worth fixing." : "Your CV has problems that can stop a parser early.";
+  if (m) v += m.pct >= 70 ? " It covers most of the job's keywords." : m.pct >= 45 ? " It covers about half of the job's keywords." : " It misses most of the job's keywords.";
+  if (worst[0]) v += " Start with: " + worst[0].name.toLowerCase() + ".";
+  out.append(el("p", "verdict", v));
+
+  const g = el("div", "gauges");
+  g.append(gauge("ATS readiness", ats, "Can a parser read it?"));
+  if (m) g.append(gauge("Job match", m.pct, "Keywords from the posting"));
+  out.append(g);
+  if (!m) out.append(el("p", "sub", "Add a job posting above to see your match percentage."));
+
+  if (m) {
+    const k = el("div", "panel card");
+    k.append(el("h2", "", "Keywords from the job posting"), el("p", "sub", "Most important first. Add missing ones only if they are true for you, using the posting's exact wording."));
+    if (m.miss.length) k.append(chipRow(m.miss, "miss"));
+    if (m.hit.length) k.append(chipRow(m.hit, "ok"));
+    out.append(k);
+    out.append(reqCard(cv, jd));
+    const hc = hiddenCard(cv, jd); if (hc) out.append(hc);
+  }
+
+  const f = el("div", "panel card");
+  f.append(el("h2", "", "What to fix"), el("p", "sub", "Sorted by impact."));
+  worst.forEach(x => f.append(fixRow(x)));
+  if (!worst.length) f.append(el("p", "", "Nothing to fix. Strong result."));
+  const good = checks.filter(c => c.got === c.max);
+  if (good.length) { const d = el("details"); d.append(el("summary", "", good.length + " checks passed")); good.forEach(x => d.append(fixRow(x))); f.append(d); }
+  out.append(f);
+
+  lastReport = ["CVcheck report", "ATS readiness: " + ats + "%", m ? "Job match: " + m.pct + "%" : "", m && m.miss.length ? "Missing keywords: " + m.miss.join(", ") : "", "", "Fixes:", ...worst.map(x => "- " + x.name + ": " + x.msg)].filter((l, i) => l || i > 3).join("\n");
+  const a = el("div", "actions"), cp = el("button", "", "Copy report"), pr = el("button", "", "Print or save as PDF");
+  cp.onclick = () => navigator.clipboard.writeText(lastReport).then(() => cp.textContent = "Copied", () => cp.textContent = "Copy failed");
+  pr.onclick = () => window.print();
+  const add = el("button", "primary", "Add this job to my ranking"); add.onclick = () => addJob(jd); if (m) a.append(add); a.append(cp, pr); out.append(a); out.append(aiBlock(cv, jd, ats, m));
+  out.scrollIntoView({ behavior: "smooth" });
+}
+
+let meta = null;
+async function readPdf(buf){
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  let text = "", wide = 0, lines = 0;
+  for (let p = 1; p <= pdf.numPages; p++) {
+    const page = await pdf.getPage(p), vw = page.getViewport({ scale: 1 }).width;
+    const items = (await page.getTextContent()).items.filter(i => i.str.trim()), rows = new Map();
+    items.forEach(i => { const k = Math.round(i.transform[5] / 3); if (!rows.has(k)) rows.set(k, []); rows.get(k).push(i); });
+    [...rows].sort((a, b) => b[0] - a[0]).forEach(([, r]) => {
+      r.sort((a, b) => a.transform[4] - b.transform[4]); lines++;
+      for (let k = 1; k < r.length; k++) if (r[k].transform[4] - (r[k - 1].transform[4] + r[k - 1].width) > vw * 0.12) { wide++; break; }
+      text += r.map(i => i.str).join(" ") + "\n";
+    });
+  }
+  return { text, columns: lines > 8 && wide / lines > 0.4 };
+}
+async function readDocx(buf){
+  const [raw, html] = await Promise.all([mammoth.extractRawText({ arrayBuffer: buf }), mammoth.convertToHtml({ arrayBuffer: buf })]);
+  return { text: raw.value, tables: (html.value.match(/<table/g) || []).length };
+}
+$("pick").onclick = () => $("file").click();
+$("cv").addEventListener("input", () => { meta = null; });
+$("file").addEventListener("change", async e => {
+  const f = e.target.files[0]; if (!f) return;
+  const msg = $("fmsg"); msg.textContent = "Reading " + f.name + "...";
+  try {
+    const buf = await f.arrayBuffer(), isPdf = /\.pdf$/i.test(f.name);
+    if (!isPdf && !/\.docx$/i.test(f.name)) throw new Error("Use a PDF or DOCX file.");
+    const r = isPdf ? await readPdf(buf) : await readDocx(buf), t = r.text.trim();
+    $("cv").value = t; count("cv", "cvc", "0 words");
+    meta = { name: f.name, chars: t.length, columns: !!r.columns, tables: r.tables || 0 };
+    msg.textContent = "Loaded " + f.name + ". This is the text a parser would see. Check it, then click Check my CV.";
+  } catch (err) { meta = null; msg.textContent = "Could not read this file: " + err.message; }
+  e.target.value = "";
+});
+
+const AI_ENDPOINT = ""; // After deploying worker.js, paste its URL here
+function aiBlock(cv, jd, ats, m){
+  const box = el("div", "panel card"), res = el("div"), btn = el("button", "primary", "Run deep analysis");
+  box.append(el("h2", "", "Deep analysis with AI (beta)"), el("p", "sub", "Reads your CV like a recruiter, by meaning and not only keywords. This sends your CV and job text to an AI provider."));
+  btn.onclick = async () => {
+    if (!AI_ENDPOINT) { res.replaceChildren(el("p", "sub", "The AI service is not connected yet. Deploy worker.js and paste its URL into AI_ENDPOINT.")); return; }
+    btn.disabled = true; btn.textContent = "Analyzing..."; res.replaceChildren();
+    try {
+      const r = await fetch(AI_ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ cv: cv.slice(0, 12000), jd: jd.slice(0, 8000) }) });
+      if (!r.ok) throw new Error(r.status === 503 ? "The free AI service is busy. Try again in a minute." : "Request failed (" + r.status + ").");
+      renderAi(res, await r.json());
+    } catch (e) { res.replaceChildren(el("p", "sub", "Could not run the analysis. " + e.message)); }
+    btn.disabled = false; btn.textContent = "Run deep analysis";
+  };
+  box.append(btn, res); return box;
+}
+function renderAi(box, d){
+  if (typeof d.match_score === "number") box.append(el("h2", "", "AI match: " + Math.round(d.match_score) + "%"));
+  if (d.match_reasoning) box.append(el("p", "", String(d.match_reasoning)));
+  [["Strengths", d.strengths], ["Gaps", d.gaps], ["Missing skills", d.missing_skills], ["ATS tips", d.ats_tips]].forEach(([t, a]) => {
+    if (Array.isArray(a) && a.length) { box.append(el("h2", "", t)); const ul = el("ul"); a.forEach(x => ul.append(el("li", "", String(x)))); box.append(ul); }
+  });
+  if (Array.isArray(d.rewrites) && d.rewrites.length) {
+    box.append(el("h2", "", "Suggested rewrites"));
+    d.rewrites.forEach(x => { const r = el("div", "fix"), b = el("div"); b.append(el("div", "sub", "Before: " + x.before), el("strong", "", "After: " + x.after), el("div", "sub", x.why || "")); r.append(b); box.append(r); });
+  }
+}
+
+const KEY = "cvcheck.jobs"; let jobs = [];
+function loadJobs(){ try { jobs = JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { jobs = []; } }
+function saveJobs(){ try { localStorage.setItem(KEY, JSON.stringify(jobs)); } catch {} }
+const companyOf = l => { const p = (l || "").split(/\s[-\u2013|@]\s/); return p.length > 1 ? tokens(p[0]) : []; };
+function titleOf(jd){ return findTitle(jd) || "Untitled job"; }
+function fit(m, rq){ let p = 0; rq.forEach(r => { if (r.name === "Experience" || r.name === "Education") p += r.s === "bad" ? 10 : r.s === "warn" ? 4 : 0; }); return Math.max(0, m.pct - p); }
+function money(x){ const f = n => Math.round(n).toLocaleString("en-US"); return (x.min === x.max ? f(x.min) : f(x.min) + "-" + f(x.max)) + " " + (x.cur || x.currency || "") + " per " + x.period + (x.basis && x.basis !== "unknown" ? ", " + x.basis : "") + (x.b2b ? ", B2B" : ""); }
+function addJob(jd){
+  const text = jd.slice(0, 12000), typed = $("jlabel").value.trim(), label = typed || titleOf(text), ex = jobs.find(j => j.jd === text);
+  if (ex) { ex.label = label; ex.auto = !typed; } else jobs.unshift({ id: Date.now(), label, auto: !typed, jd: text, stated: parseSalary(text) });
+  jobs = jobs.slice(0, 30); saveJobs(); renderRank(); $("rank").scrollIntoView({ behavior: "smooth" });
+}
+async function estimate(j, btn, d){
+  if (!AI_ENDPOINT) { d.append(el("small", "", " The AI service is not connected yet.")); return; }
+  btn.disabled = true; btn.textContent = "Researching...";
+  try {
+    const r = await fetch(AI_ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mode: "salary", title: j.label, location: $("loc").value.trim(), jd: j.jd.slice(0, 3500) }) });
+    if (!r.ok) throw new Error(r.status === 503 ? "The free AI service is busy. Try again later." : "Request failed (" + r.status + ").");
+    const e = await r.json();
+    if (typeof e.min !== "number" || typeof e.max !== "number") throw new Error("No usable estimate returned.");
+    j.est = e; saveJobs(); renderRank();
+  } catch (err) { btn.disabled = false; btn.textContent = "Estimate salary"; d.append(el("small", "", " " + err.message)); }
+}
+function salaryLine(j){
+  const d = el("div", "sal");
+  if (j.stated) { d.append(el("span", "tagl", "In posting:"), document.createTextNode(" " + money(j.stated) + (j.stated.guessed ? " (period guessed)" : ""))); return d; }
+  if (j.est) {
+    const e = j.est;
+    d.append(el("span", "tagl", "Estimate:"), document.createTextNode(" about " + money(e) + ". Confidence: " + e.confidence + ". " + (e.searched ? "Based on web search." : "Based on general model knowledge, not live data.") + " " + (e.note || "")));
+    (e.sources || []).slice(0, 3).filter(x => /^https:\/\//.test(x.url || "")).forEach(x => { const a = el("a", "src", x.title || "source"); a.href = x.url; a.target = "_blank"; a.rel = "noopener noreferrer"; d.append(a); });
+    return d;
+  }
+  const b = el("button", "link", "Estimate salary"); b.style.padding = "2px 0"; b.onclick = () => estimate(j, b, d); d.append(b); return d;
+}
+function renderRank(){
+  const box = $("rank"), rows = $("rows"), cv = $("cv").value.trim();
+  box.classList.toggle("hidden", !jobs.length); rows.replaceChildren();
+  if (!jobs.length) return;
+  jobs.forEach(j => { if (j.auto !== false) j.label = titleOf(j.jd); });
+  if (cv.length < 100) { rows.append(el("p", "sub", "Paste or upload your CV above, then click Update ranking.")); return; }
+  jobs.map(j => { const m = keywordMatch(cv, j.jd, companyOf(j.label)), rq = reqs(cv, j.jd); return { j, m, rq, f: fit(m, rq) }; }).sort((a, b) => b.f - a.f).forEach(({ j, m, rq, f }, i) => {
+    const r = el("div", "rk"), mid = el("div"), act = el("div", "ra"), sc = el("b", "", f + "");
+    sc.style.color = "var(--" + tone(f) + ")";
+    mid.append(el("strong", "", j.label), el("div", "sub", "Keyword match " + m.pct + "%." + (rq.length ? " Requirements met " + rq.filter(x => x.s === "good").length + " of " + rq.length + "." : "")), salaryLine(j));
+    const open = el("button", "link", "Open"), del = el("button", "link", "Remove");
+    open.onclick = () => { $("jd").value = j.jd; $("jlabel").value = j.label; count("jd", "jdc", "optional"); run(); };
+    del.onclick = () => { jobs = jobs.filter(x => x.id !== j.id); saveJobs(); renderRank(); };
+    act.append(sc, el("small", "", "fit score"), open, del);
+    r.append(el("div", "rn", "#" + (i + 1)), mid, act); rows.append(r);
+  });
+}
+$("upd").onclick = renderRank;
+$("wipe").onclick = () => { if (confirm("Remove all saved jobs from this browser?")) { jobs = []; saveJobs(); renderRank(); } };
+
+const count = (id, el2, empty) => { const n = tokens($(id).value).length; $(el2).textContent = n ? n + " words" : empty; };
+$("cv").addEventListener("input", () => count("cv", "cvc", "0 words"));
+$("jd").addEventListener("input", () => count("jd", "jdc", "optional"));
+$("go").onclick = run;
+$("sample").onclick = () => { meta = null; $("fmsg").textContent = ""; $("cv").value = SAMPLE_CV; $("jd").value = SAMPLE_JD; count("cv", "cvc", "0 words"); count("jd", "jdc", "optional"); run(); };
+$("clear").onclick = () => { meta = null; $("fmsg").textContent = ""; $("cv").value = ""; $("jd").value = ""; count("cv", "cvc", "0 words"); count("jd", "jdc", "optional"); $("results").classList.add("hidden"); };
+document.addEventListener("keydown", e => { if ((e.ctrlKey || e.metaKey) && e.key === "Enter") run(); });
+loadJobs(); renderRank();
+</script>
+</body>
+</html>
