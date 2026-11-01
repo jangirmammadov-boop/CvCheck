@@ -430,7 +430,7 @@ $("file").addEventListener("change", async e => {
   e.target.value = "";
 });
 
-const AI_ENDPOINT = ""; // After deploying worker.js, paste its URL here
+const AI_ENDPOINT = "https://cvcheck-ai.jangirmammadov.workers.dev"; // After deploying worker.js, paste its URL here
 function aiBlock(cv, jd, ats, m){
   const box = el("div", "panel card"), res = el("div"), btn = el("button", "primary", "Run deep analysis");
   box.append(el("h2", "", "Deep analysis with AI (beta)"), el("p", "sub", "Reads your CV like a recruiter, by meaning and not only keywords. This sends your CV and job text to an AI provider."));
