@@ -1,0 +1,8 @@
+CVcheck site - how to edit (no coding needed)
+
+FAQ:          open faq/index.html on GitHub, click the pencil. Copy one <details class="q"> ... </details> line, paste it, change the text. Commit.
+Pain points:  open index.html, find <article class="pain">. Copy one block, paste it, change the text. Commit.
+Contact email (privacy page): open assets/config.js, put your email in contactEmail:"" . Commit.
+AI address:   assets/config.js -> aiEndpoint (already set to your worker).
+Colours:      assets/site.css, the :root block at the top.
+After each commit GitHub Pages updates in 1-2 minutes. Refresh with Ctrl+F5.

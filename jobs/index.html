@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My jobs | CVcheck</title>
+<meta name="description" content="Your saved job postings, ranked by how well your CV fits, with salary information.">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body data-page="jobs">
+<div class="wrap">
+<div id="site-header"></div>
+<main>
+
+<div class="page-head"><h1>My jobs</h1><p>Postings you saved, ranked by how well your current CV fits. They are saved in this browser only.</p></div>
+<section id="rank" class="panel">
+  <div class="actions" style="margin-top:0"><input type="text" id="loc" placeholder="Country or city for salary estimates, e.g. Warsaw, Poland" aria-label="Location for salary estimates" style="flex:1;min-width:220px;margin:0"><button id="upd" type="button">Update ranking</button><button id="wipe" class="link" type="button">Remove all</button></div>
+  <div id="rows"></div>
+</section>
+
+</main>
+<div id="site-footer"></div>
+</div>
+<script src="../assets/config.js"></script>
+<script src="../assets/core.js"></script>
+<script src="../assets/layout.js"></script>
+<script src="../assets/page-jobs.js"></script>
+</body>
+</html>

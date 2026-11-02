@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Check your CV against a job | CVcheck</title>
+<meta name="description" content="Paste your CV and a job posting to get an ATS readiness score, a keyword and requirements match, and an optional AI analysis.">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body data-page="check">
+<div class="wrap">
+<div id="site-header"></div>
+<main>
+
+<div class="page-head"><h1>Check your CV against a job</h1><p>Add your CV and the job posting. You get a readability score, a match, and what to fix.</p></div>
+<section class="panel in">
+  <div class="inputs">
+    <div class="field">
+      <label for="cv">Your CV <span id="cvc">0 words</span></label>
+      <textarea id="cv" placeholder="Paste the text of your CV, or upload a file below"></textarea>
+      <div class="up"><button type="button" id="pick">Upload PDF or DOCX</button><input id="file" type="file" accept=".pdf,.docx" hidden><small id="fmsg"></small></div>
+      <label class="rem"><input type="checkbox" id="remember"><span>Remember my CV on this device. Otherwise it is forgotten when you close this tab.</span></label>
+    </div>
+    <div class="field">
+      <label for="jd">Job posting <span id="jdc">optional</span></label>
+      <textarea id="jd" placeholder="Paste the whole posting: tasks, requirements and nice-to-haves. Tools mentioned anywhere are counted."></textarea>
+      <input type="text" id="jlabel" maxlength="80" placeholder="Label, e.g. Company - Role (optional)" aria-label="Job label">
+      <span class="tip">Paste everything. Postings often list tools in the tasks that are missing from the requirements, and we check both.</span>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="primary" id="go" type="button">Check my CV</button>
+    <button class="link" id="sample" type="button">Try an example</button>
+    <button class="link" id="clear" type="button">Clear</button>
+    <span class="hint">Ctrl + Enter</span>
+  </div>
+</section>
+<section id="results" class="hidden" aria-live="polite"></section>
+
+</main>
+<div id="site-footer"></div>
+</div>
+<script src="../assets/config.js"></script>
+<script src="../assets/core.js"></script>
+<script src="../assets/layout.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="../assets/page-check.js"></script>
+</body>
+</html>

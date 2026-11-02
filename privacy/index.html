@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy | CVcheck</title>
+<meta name="description" content="How CVcheck handles your CV, job postings and saved data.">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body data-page="privacy">
+<div class="wrap">
+<div id="site-header"></div>
+<main>
+
+<div class="page-head"><h1>Privacy</h1><p>What happens to your data when you use CVcheck.</p></div>
+<div class="prose">
+<h2>What stays on your device</h2>
+<p>The basic checks (readability score, keyword match, requirements) run in your browser. Your saved jobs, your applications and your settings are stored in your browser's own storage on your device. We do not receive them.</p>
+<p>Your CV is kept only in the open browser tab and is forgotten when you close it. If you tick "Remember my CV on this device", it is also stored in your browser until you untick that box.</p>
+<h2>What is sent to others</h2>
+<p>If you use the optional AI analysis or a salary estimate, the text of your CV and the job posting (or the job title and posting for a salary estimate) is sent through our service to an AI provider, currently Google (Gemini) or Groq, to produce the result. Our service does not save this text. The provider processes it under its own terms, which can include storing it for a period. Google's terms for free access may allow it to use submitted content to improve its products, so do not use the AI features if you are not comfortable with that.</p>
+<h2>Cookies and tracking</h2>
+<p>CVcheck sets no cookies and has no advertising or analytics scripts at the moment. The upload feature loads two open-source libraries from a public content network (cdnjs).</p>
+<h2>Deleting your data</h2>
+<p>On the Applications page, "Erase everything" removes your saved jobs and applications from this browser. You can also clear your browser's site data. Closing the tab forgets your CV.</p>
+<h2>Contact</h2>
+<p id="contact">Questions about privacy can be sent to <span id="contact-mail"></span>.</p>
+<h2>Changes</h2>
+<p>If this changes, for example when accounts are added, this page will be updated before the change goes live.</p>
+</div>
+
+</main>
+<div id="site-footer"></div>
+</div>
+<script src="../assets/config.js"></script>
+<script src="../assets/core.js"></script>
+<script src="../assets/layout.js"></script>
+<script>
+(function(){ const s = document.getElementById("contact-mail"); if (SITE.contactEmail) { const a = document.createElement("a"); a.href = "mailto:" + SITE.contactEmail; a.textContent = SITE.contactEmail; s.replaceWith(a); } else { s.textContent = "[add your contact email in assets/config.js]"; } })();
+</script>
+</body>
+</html>
