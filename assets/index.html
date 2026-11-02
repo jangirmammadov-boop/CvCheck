@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Applications tracker | CVcheck</title>
+<meta name="description" content="Track your job applications, statuses and follow-ups, and see how many get replies. Saved in your browser.">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body data-page="applications">
+<div class="wrap">
+<div id="site-header"></div>
+<main>
+
+<div class="page-head"><h1>Applications</h1><p>Track where you applied, what happened, and what to do next. Everything is saved in this browser, and you can download a backup.</p></div>
+<div id="backupnote" class="panel warnbox hidden" role="status"></div>
+<div class="panel"><h2>Your search so far</h2><div id="funnel"></div></div>
+<details class="panel" id="addbox">
+  <summary id="formtitle">Add an application</summary>
+  <form id="tform" class="form2" autocomplete="off">
+    <div><label for="t_role">Role</label><input id="t_role" type="text" maxlength="120"></div>
+    <div><label for="t_company">Company</label><input id="t_company" type="text" maxlength="80"></div>
+    <div class="wide"><label for="t_url">Link to the posting</label><input id="t_url" type="url" maxlength="500" placeholder="https://"></div>
+    <div><label for="t_status">Status</label><select id="t_status"></select></div>
+    <div><label for="t_applied">Date applied</label><input id="t_applied" type="date"></div>
+    <div><label for="t_step">Next step</label><input id="t_step" type="text" maxlength="100" placeholder="e.g. Follow up with the recruiter"></div>
+    <div><label for="t_next">Next step date</label><input id="t_next" type="date"></div>
+    <div><label for="t_cv">CV version used</label><input id="t_cv" type="text" maxlength="60" placeholder="e.g. Data analyst v3"></div>
+    <div><label for="t_salary">Salary</label><input id="t_salary" type="text" maxlength="80" placeholder="e.g. 12 000 PLN gross per month"></div>
+    <div class="wide"><label for="t_notes">Notes</label><textarea id="t_notes" maxlength="2000" placeholder="Contacts, questions to ask, what went well"></textarea></div>
+    <div class="wide actions" style="margin:0"><button class="primary" type="submit" id="t_save">Save application</button><button type="button" class="link" id="t_cancel">Cancel</button><span class="note" id="t_msg" role="status"></span></div>
+  </form>
+</details>
+<div class="panel">
+  <h2>Applications</h2>
+  <p class="note" id="amsg" role="status" style="margin:0 0 8px"></p>
+  <div id="due"></div>
+  <input type="search" id="tsearch" placeholder="Search by role, company or notes" aria-label="Search applications">
+  <div class="chipsrow" id="tfilters" role="group" aria-label="Filter by status"></div>
+  <div id="tlist"></div>
+</div>
+<div class="panel">
+  <h2>Your data</h2>
+  <p class="sub">Applications and saved jobs are stored only in this browser. Your CV text is never included. Download a backup now and then, and use it to move to another device.</p>
+  <div class="actions" style="margin-top:0"><button type="button" id="b_json">Download backup</button><button type="button" id="b_csv">Export for Excel (CSV)</button><button type="button" id="b_restore">Restore from backup</button><input id="b_file" type="file" accept=".json,application/json" hidden><button type="button" class="link" id="b_wipe">Erase everything</button></div>
+  <p class="note" id="tmsg" role="status"></p>
+</div>
+
+</main>
+<div id="site-footer"></div>
+</div>
+<script src="../assets/config.js"></script>
+<script src="../assets/core.js"></script>
+<script src="../assets/layout.js"></script>
+<script src="../assets/page-apps.js"></script>
+</body>
+</html>
