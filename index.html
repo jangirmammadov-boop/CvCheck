@@ -5,59 +5,47 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CVcheck: free ATS score and job match for your CV</title>
 <meta name="description" content="Check how well your CV reads for applicant tracking systems and how closely it matches a job posting. Free, with no account.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=DM+Sans:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="assets/site.css">
 </head>
 <body data-page="home">
 <div class="wrap">
 <div id="site-header"></div>
 <main>
-
-<section class="home-hero">
-  <div>
-    <h1>Will your CV get past the robots?</h1>
-    <p class="lead">Paste your CV and a job posting. You get a readability score, a match against what the job really asks for, and a short list of what to fix. It is free, and you do not need an account.</p>
-    <div class="cta-row">
-      <a class="btn primary" href="check/">Check my CV</a>
-      <a class="btn" href="#how">See how it works</a>
-    </div>
-    <p class="fine">Checks run in your browser. Your applications stay on your device.</p>
+<section class="c-hero">
+  <h1>Will your CV get past the robots?</h1>
+  <p class="lead">Paste your CV and a job posting. You get a readability score, a match against what the job really asks for, and a short list of what to fix. It is free, and you do not need an account.</p>
+  <div class="cta-row">
+    <a class="btn primary" href="check/">Check my CV</a>
+    <a class="btn" href="#how">See how it works</a>
   </div>
-  <figure class="robot" aria-label="Illustration: a two-column CV can be read out of order by a parser">
-    <div>
-      <figcaption>What you designed</figcaption>
-      <div class="sheet cvmock" aria-hidden="true">
-        <div class="side"><b>Skills</b><p>SQL<br>Python<br>Excel</p><b>Contact</b><p>jane@mail.com</p></div>
-        <div><b>Experience</b><p>Data Analyst, Acme Corp<br>2021 to 2024<br>Built dashboards for weekly reporting</p></div>
-      </div>
-    </div>
-    <div class="flow" aria-hidden="true">read by many parsers like this</div>
-    <div>
-      <figcaption>What a parser may see (illustration)</figcaption>
-      <div class="sheet"><pre class="parsed" aria-hidden="true">Skills  <mark>Experience</mark>
-SQL  <mark>Data Analyst, Acme Corp</mark>
-Python  <mark>2021 to 2024</mark>
-Excel  <mark>Built dashboards</mark>
-Contact  <mark>for weekly</mark>
-jane@mail.com  <mark>reporting</mark></pre></div>
-    </div>
-  </figure>
+  <p class="fine">Checks run in your browser. Your applications stay on your device.</p>
+  <div class="tiles" role="img" aria-label="Example report: ATS readiness 72 percent, a keyword list with found and missing terms, and a job match of 6.5 out of 10. Example values only.">
+    <div class="tile t-deep"><span class="lbl">ATS readiness</span><b>72%</b><small>3 things to fix</small></div>
+    <div class="tile t-white"><span class="lbl">Keywords from the job</span>
+      <div class="kw"><span class="y">SQL</span><span class="y">Python</span><span class="y">dashboards</span><span class="n2">Power BI</span><span class="n2">stakeholder reporting</span></div>
+      <small>Green: found in your CV. Orange: missing. Example only.</small></div>
+    <div class="tile t-lemon"><span class="lbl">Job match</span><b>6.5</b><small>out of 10, capped by one missing must-have</small></div>
+  </div>
 </section>
 
-<section class="block" id="pain">
+<section class="sec" id="pain">
   <h2>Why good CVs get ignored</h2>
   <p class="sec-sub">Most of these problems have nothing to do with how good you are. They are about how your CV is read, and how you spend your time.</p>
   <div class="pains">
-    <!-- To add a pain point: copy one <article class="pain"> block, paste it below the last one, and change the text. -->
-    <article class="pain"><h3>Your CV looks great, but the parser reads it wrong</h3><p>Columns, tables, icons and text boxes can scramble the order, so dates and job titles land in the wrong fields.</p><p class="fix">CVcheck reads your file the way a parser would, and flags columns, tables, icons and scanned pages.</p></article>
-    <article class="pain"><h3>The posting asks for what you did, in different words</h3><p>Recruiters often search for exact terms. "Managed access reviews" and "access recertification" can be the same work, but a keyword search sees two different things.</p><p class="fix">You see which terms are missing, and an optional AI analysis judges by meaning. You decide what is true for you.</p></article>
-    <article class="pain"><h3>Must-haves hide in the task list</h3><p>Many postings name tools in the tasks that never appear under requirements, so a quick read misses them.</p><p class="fix">CVcheck reads the whole posting and points out tools that appear only in the tasks.</p></article>
-    <article class="pain"><h3>You cannot tell which roles are worth your time</h3><p>Applying to everything is slow, and one missing hard requirement can matter more than ten matched skills.</p><p class="fix">Scores are capped when a hard requirement or a seniority gap is missing, and your saved jobs are ranked.</p></article>
-    <article class="pain"><h3>Applications disappear into a void</h3><p>After a few weeks it is hard to remember where you applied, which CV you sent, and when to follow up.</p><p class="fix">The tracker keeps statuses, follow-up dates, the CV version and notes, and shows how many applications get a reply.</p></article>
-    <article class="pain"><h3>Salary is a mystery</h3><p>Many postings do not show a salary, so you find out late whether the role fits your needs.</p><p class="fix">CVcheck reads the salary when it is stated. When it is not, you get a clearly labeled estimate with its sources.</p></article>
+    <!-- To add a pain point: copy one <article class="pain"> block, paste it below the last one, and change the text.
+         Colours: add peach, mint, lemon, lilac or deep after "pain". Add "big" to make it wider. -->
+    <article class="pain big peach"><h3>Your CV looks great, but the parser reads it wrong</h3><p>Columns, tables, icons and text boxes can scramble the order, so dates and job titles land in the wrong fields.</p><p class="fix2">CVcheck reads your file the way a parser would, and flags columns, tables, icons and scanned pages.</p></article>
+    <article class="pain mint"><h3>The posting asks for what you did, in different words</h3><p>Recruiters often search for exact terms. "Managed access reviews" and "access recertification" can be the same work, but a keyword search sees two different things.</p><p class="fix2">You see which terms are missing, and an optional AI analysis judges by meaning. You decide what is true for you.</p></article>
+    <article class="pain"><h3>Must-haves hide in the task list</h3><p>Many postings name tools in the tasks that never appear under requirements, so a quick read misses them.</p><p class="fix2">CVcheck reads the whole posting and points out tools that appear only in the tasks.</p></article>
+    <article class="pain lemon"><h3>You cannot tell which roles are worth your time</h3><p>Applying to everything is slow, and one missing hard requirement can matter more than ten matched skills.</p><p class="fix2">Scores are capped when a hard requirement or a seniority gap is missing, and your saved jobs are ranked.</p></article>
+    <article class="pain lilac"><h3>Applications disappear into a void</h3><p>After a few weeks it is hard to remember where you applied, which CV you sent, and when to follow up.</p><p class="fix2">The tracker keeps statuses, follow-up dates, the CV version and notes, and shows how many applications get a reply.</p></article>
+    <article class="pain big deep"><h3>Salary is a mystery</h3><p>Many postings do not show a salary, so you find out late whether the role fits your needs.</p><p class="fix2">CVcheck reads the salary when it is stated. When it is not, you get a clearly labeled estimate with its sources.</p></article>
   </div>
 </section>
 
-<section class="block" id="how">
+<section class="band" id="how">
   <h2>How it works</h2>
   <p class="sec-sub">It takes about a minute for your first check.</p>
   <ol class="steps">
@@ -67,41 +55,37 @@ jane@mail.com  <mark>reporting</mark></pre></div>
   </ol>
 </section>
 
-<section class="block" id="features">
-  <h2>What you get</h2>
-  <dl class="features">
-    <div><dt>ATS readiness score</dt><dd>How easily an automated system can read your CV, with specific fixes.</dd></div>
-    <div><dt>Job match</dt><dd>Which keywords and requirements from the posting your CV covers, and which it misses.</dd></div>
-    <div><dt>Deep analysis with AI</dt><dd>Each requirement judged as full, partial or none, with the reason and the exact line from your CV.</dd></div>
-    <div><dt>Hard-requirement caps</dt><dd>A missing must-have or a big seniority gap limits the score, and the page tells you why.</dd></div>
-    <div><dt>Job ranking and salary</dt><dd>Save postings and rank them for your CV. Stated salaries are read automatically.</dd></div>
-    <div><dt>Application tracker</dt><dd>Statuses, follow-up dates, notes and a backup you can download.</dd></div>
-  </dl>
-</section>
-
-<section class="block" id="limits">
-  <h2>What it cannot do</h2>
-  <div class="limits">
+<section class="two" id="features">
+  <div class="box wide">
+    <h2>What you get</h2>
+    <dl class="features">
+      <div><dt>ATS readiness score.</dt><dd>How easily an automated system can read your CV, with specific fixes.</dd></div>
+      <div><dt>Job match.</dt><dd>Which keywords and requirements from the posting your CV covers, and which it misses.</dd></div>
+      <div><dt>Deep analysis with AI.</dt><dd>Each requirement judged as full, partial or none, with the exact line from your CV.</dd></div>
+      <div><dt>Hard-requirement caps.</dt><dd>A missing must-have or a big seniority gap limits the score, and the page tells you why.</dd></div>
+      <div><dt>Job ranking and salary.</dt><dd>Save postings and rank them for your CV. Stated salaries are read automatically.</dd></div>
+      <div><dt>Application tracker.</dt><dd>Statuses, follow-up dates, notes and a backup you can download.</dd></div>
+    </dl>
+  </div>
+  <div class="box peach" id="limits">
+    <h2>What it cannot do</h2>
     <p>It cannot see the rules of a specific company's system, because companies use different tools and keep their rules private.</p>
     <p>A high score does not promise an interview. Use scores to compare roles and find gaps, not to predict offers.</p>
   </div>
 </section>
 
-<section class="block" id="faq-preview">
+<section class="faqprev" id="faq-preview">
   <h2>Common questions</h2>
   <details class="q"><summary>Does an ATS automatically reject my CV?</summary><p>Often it does not. Many systems read your CV into fields and let recruiters search and filter. Some employers also add knock-out questions. A readable CV with the right wording helps in both cases.</p></details>
   <details class="q"><summary>Is my CV stored?</summary><p>The basic checks run in your browser. The optional AI analysis sends your CV and the posting text to an AI provider to produce the result. Saved jobs and applications stay in your browser.</p></details>
   <details class="q"><summary>Should I copy keywords from the posting?</summary><p>Only when they truthfully describe your experience. Use the posting's wording where it is accurate, and never add skills you do not have.</p></details>
-  <p><a href="faq/">See all questions</a></p>
+  <p><a href="faq/"><strong>See all questions</strong></a></p>
 </section>
 
-<section class="block">
-  <div class="cta-band">
-    <div><h2>Check your CV now</h2><p>Free, and no account needed.</p></div>
-    <a class="btn primary" href="check/">Check my CV</a>
-  </div>
+<section class="cta-card">
+  <div><h2>Check your CV now</h2><p>Free, and no account needed.</p></div>
+  <a class="btn" href="check/">Check my CV</a>
 </section>
-
 </main>
 <div id="site-footer"></div>
 </div>

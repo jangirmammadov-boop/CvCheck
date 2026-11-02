@@ -218,12 +218,12 @@ function cleanAnalysis(raw, cv){
   const yrs = x => Number.isFinite(+x) && +x >= 0 && +x <= 60 ? +x : null;
   const lv = (x, d) => Object.prototype.hasOwnProperty.call(LADDER, x) ? x : d;
   const job = raw && raw.job || {}, cand = raw && raw.candidate || {};
-  const reqs = (Array.isArray(raw && raw.requirements) ? raw.requirements : []).slice(0, 30).map(r => {
+  const reqs = (Array.isArray(raw && raw.requirements) ? raw.requirements : []).filter(r => r && typeof r === "object").slice(0, 30).map(r => {
     const tier = TIERS.includes(r.tier) ? r.tier : "duty";
     let status = STATS.includes(r.status) ? r.status : "none", verified = true;
     const evidence = str(r.evidence, 240);
     if (status !== "none" && !evidenceFound(evidence, cv)) { verified = false; if (status === "full") status = "partial"; }
-    return { text: str(r.text, 200), tier, hard: r.hard === true && tier === "must", kind: str(r.kind, 20), status, evidence, verified, reason: str(r.reason, 260) };
+    return { text: str(r.text || r.requirement || r.name || r.description, 200), tier, hard: r.hard === true && tier === "must", kind: str(r.kind, 20), status, evidence, verified, reason: str(r.reason, 260) };
   }).filter(r => r.text);
   const list = x => (Array.isArray(x) ? x : []).slice(0, 6).map(v => str(v, 260)).filter(Boolean);
   return {
@@ -265,8 +265,12 @@ async function analyzeAi(cv, jd){
   if (!SITE.aiEndpoint) throw new Error("The AI service is not connected yet.");
   const r = await fetch(SITE.aiEndpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mode: "match", cv: cv.slice(0, 12000), jd: jd.slice(0, 8000) }) });
   if (!r.ok) { let d = ""; try { d = ((await r.json()).detail || []).join(" | "); } catch {} throw new Error((r.status === 503 ? "The free AI service is busy. Try again in a minute." : "Request failed (" + r.status + ").") + (d ? " Details: " + d : " No reason came back from the worker, so the version running on Cloudflare is probably old. Paste the newest worker.js into Cloudflare and click Deploy.")); }
-  const a = cleanAnalysis(await r.json(), cv);
-  if (!a.requirements.length) throw new Error("The AI returned no usable requirements. Try again.");
+  const raw = await r.json();
+  const a = cleanAnalysis(raw, cv);
+  if (!a.requirements.length) {
+    const n = Array.isArray(raw && raw.requirements) ? raw.requirements.length : 0;
+    throw new Error("The AI returned no usable requirements. Try again. (Details: answer had " + n + " requirements, fields: " + Object.keys(raw || {}).join(", ").slice(0, 120) + ". If 'requirements' is missing, the old worker is still running: open your worker address and check it shows version 2026-11-01-c.)");
+  }
   return { a, s: scoreMatch(a) };
 }
 
